@@ -1,15 +1,15 @@
 """
-This is a simple trivia game for 
+This is a simple trivia game for
 assignment #4.
 Property of @Miguel Carvalho
 """
 
 import requests
 from random import randrange
-import json
 
 # -- globals
 difficulty = 'hard'
+debug = True
 
 # generated from the 'open trivia database' API
 questionsUrl = 'https://opentdb.com/api.php?amount=10&category=9&difficulty=hard&type=multiple'
@@ -42,7 +42,7 @@ def generateOptions(questions):
     'options' key.
     """
     for q in questions:
-        index = randrange(0, 3)
+        index = randrange(0, 4)
         q['options'] = q.get('incorrect')
         q['options'].insert(index, q.get('correct'))
     return questions
@@ -51,7 +51,7 @@ def generateOptions(questions):
 def displayOptions(question):
     """
     Display each question's
-    answer options. 
+    answer options.
     """
     print(question['question'])
     for i, option in enumerate(question['options']):
@@ -123,11 +123,9 @@ def postResult(gameData, score, username):
     Updates gameData and 'POST's score
     to leaderboard.
     """
-    gameData['score'] = score
+    gameData['points'] = score
     gameData['username'] = username
-
-    # make json request, using 'POST' to leaderboardUrl
-    return requests.post(leaderboardUrl, json.dumps(gameData))
+    return requests.post(leaderboardUrl, gameData).json()
 
 
 def main():
@@ -142,10 +140,10 @@ def main():
         question = questions[i]
         print(f'Question {i+1}')
         displayOptions(question)
-        print(question['correct'])
+        if debug:
+            print(question['correct'])
         user_ans = getUserInput()
         userAnswers = displayAnswer(user_ans, question, userAnswers)
-        print(userAnswers)
         if checkBamboozle(i, userAnswers):
             print('You were Bamboozled.')
             bamboozled = True
@@ -155,8 +153,7 @@ def main():
         username = getUserInput(type='str')
 
         print(f'Score: {score} points')
-        response = postResult(gameData, score, username)
-        print()
+        postResult(gameData, score, username)
 
 
 main()
