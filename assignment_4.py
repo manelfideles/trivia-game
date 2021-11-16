@@ -1,7 +1,8 @@
 """
 This is a simple trivia game for
 assignment #4.
-Property of @Miguel Carvalho
+
+Property of @Miguel Carvalho.
 """
 
 import requests
